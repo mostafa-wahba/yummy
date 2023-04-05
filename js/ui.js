@@ -383,32 +383,56 @@ export class Ui {
           this.mealDetails(details.meals);
         }
       });
+      // strIngredient
       let detailsContainer = ``;
+      let IngredientNames = [];
+      let tagsNames = [];
+      let IngredientContainer = ``;
+      let tagsContainer = ``;
       for (let index = 0; index < mealArr.length; index++) {
+        IngredientNames = Object.keys(mealArr[index])
+          .filter(
+            (key) =>
+              key.includes("strIngredient") &&
+              mealArr[index][key] !== null &&
+              mealArr[index][key] !== ""
+          )
+          .map((key) => mealArr[index][key]);
+        for (let i = 0; i < IngredientNames.length; i++) {
+          IngredientContainer += `
+          <li class="alert alert-info m-2 p-1">${IngredientNames[i]}</li>`;
+        }
+        tagsNames = mealArr[index].strTags
+          ? mealArr[index].strTags.split(",")
+          : [];
+        for (let i = 0; i < tagsNames.length; i++) {
+          tagsContainer += `
+          <li class="alert alert-danger m-2 p-1">${tagsNames[i]}</li>
+          `;
+        }
         detailsContainer += `
-        <div class="col-md-4">
-        <img class="w-100 rounded-3" src="${mealArr[index].strMealThumb}" alt="">
-            <h2>${mealArr[index].strMeal}</h2>
-    </div>
-    <div class="col-md-8">
-            <h2>Instructions</h2>
-            <p>${mealArr[index].strInstructions}</p>
-            <h3><span class="fw-bolder">Area : </span>${mealArr[index].strArea}</h3>
+          <div class="col-md-4">
+          <img class="w-100 rounded-3" src="${mealArr[index].strMealThumb}" alt="">
+          <h2>${mealArr[index].strMeal}</h2>
+          </div>
+          <div class="col-md-8">
+          <h2>Instructions</h2>
+          <p>${mealArr[index].strInstructions}</p>
+          <h3><span class="fw-bolder">Area : </span>${mealArr[index].strArea}</h3>
             <h3><span class="fw-bolder">Category : </span>${mealArr[index].strCategory}</h3>
             <h3>Recipes :</h3>
             <ul class="list-unstyled d-flex g-3 flex-wrap">
-                <li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient1}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient2}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient3}</li><li class="alert alert-info m-2 p-1">2${mealArr[index].strIngredient4}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient5}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient6}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient7}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient9}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient10}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient11}</li><li class="alert alert-info m-2 p-1">2 tsp Cornstarch</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient12}</li><li class="alert alert-info m-2 p-1">${mealArr[index].strIngredient13}</li>
+            ${IngredientContainer}
             </ul>
-
+            
             <h3>Tags :</h3>
             <ul class="list-unstyled d-flex g-3 flex-wrap">
-                
-    <li class="alert alert-danger m-2 p-1">${mealArr[index].strTags}</li>
+            ${tagsContainer}
             </ul>
-
+            
             <a target="_blank" href="${mealArr[index].strSource}" class="btn btn-success">Source</a>
             <a target="_blank" href="${mealArr[index].strYoutube}" class="btn btn-danger">Youtube</a>
-        </div>`;
+            </div>`;
       }
       $("#rowdata").html(detailsContainer);
     } catch (error) {
