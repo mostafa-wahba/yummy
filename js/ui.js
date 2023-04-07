@@ -76,11 +76,139 @@ export class Ui {
         let name = await this.nameSearchFetch($(this.fInput).val());
         console.log(name);
         this.searchData(name);
+        $("#searchdata").click(async (e) => {
+          console.log(
+            $(e.target)
+              .parents(".meal")
+              .children(".meal-layer")
+              .children("h3")
+              .text()
+          );
+          if ($(e.target).parents(".meal").attr("id") == undefined) {
+            let mealName = $(e.target)
+              .parents(".meal")
+              .children(".meal-layer")
+              .children("h3")
+              .text();
+            this.showMeal(await this.mealFetch(mealName));
+          } else if ($(e.target).parents(".meal").attr("id") != undefined) {
+            let mealId = $(e.target).parents(".meal").attr("id");
+            let details = (await this.idFetch(mealId)).meals;
+            let detailsContainer = ``;
+            let IngredientNames = [];
+            let tagsNames = [];
+            let IngredientContainer = ``;
+            let tagsContainer = ``;
+            for (let index = 0; index < details.length; index++) {
+              IngredientNames = Object.keys(details[index])
+                .filter(
+                  (key) =>
+                    key.includes("strIngredient") &&
+                    details[index][key] !== null &&
+                    details[index][key] !== ""
+                )
+                .map((key) => details[index][key]);
+              for (let i = 0; i < IngredientNames.length; i++) {
+                IngredientContainer += `
+          <li class="alert alert-info m-2 p-1">${IngredientNames[i]}</li>`;
+              }
+              tagsNames = details[index].strTags
+                ? details[index].strTags.split(",")
+                : [];
+              for (let i = 0; i < tagsNames.length; i++) {
+                tagsContainer += `
+          <li class="alert alert-danger m-2 p-1">${tagsNames[i]}</li>
+          `;
+              }
+              detailsContainer += `
+          <div class="col-md-4">
+          <img class="w-100 rounded-3" src="${details[index].strMealThumb}" alt="">
+          <h2>${details[index].strMeal}</h2>
+          </div>
+          <div class="col-md-8">
+          <h2>Instructions</h2>
+          <p>${details[index].strInstructions}</p>
+          <h3><span class="fw-bolder">Area : </span>${details[index].strArea}</h3>
+            <h3><span class="fw-bolder">Category : </span>${details[index].strCategory}</h3>
+            <h3>Recipes :</h3>
+            <ul class="list-unstyled d-flex g-3 flex-wrap">
+            ${IngredientContainer}
+            </ul>
+            
+            <h3>Tags :</h3>
+            <ul class="list-unstyled d-flex g-3 flex-wrap">
+            ${tagsContainer}
+            </ul>
+            
+            <a target="_blank" href="${details[index].strSource}" class="btn btn-success">Source</a>
+            <a target="_blank" href="${details[index].strYoutube}" class="btn btn-danger">Youtube</a>
+            </div>`;
+            }
+            $("#searchdata").html(detailsContainer);
+          }
+        });
       });
       $(this.sInput).keyup(async () => {
         console.log($(this.sInput).val());
         let letter = await this.letterSearchFetch($(this.sInput).val());
         this.searchData(letter);
+        $("#searchdata").click(async (e) => {
+          {
+            let mealId = $(e.target).parents(".meal").attr("id");
+            let details = await this.idFetch(mealId);
+            let detailsContainer = ``;
+            let IngredientNames = [];
+            let tagsNames = [];
+            let IngredientContainer = ``;
+            let tagsContainer = ``;
+            for (let index = 0; index < details.length; index++) {
+              IngredientNames = Object.keys(details[index])
+                .filter(
+                  (key) =>
+                    key.includes("strIngredient") &&
+                    details[index][key] !== null &&
+                    details[index][key] !== ""
+                )
+                .map((key) => details[index][key]);
+              for (let i = 0; i < IngredientNames.length; i++) {
+                IngredientContainer += `
+          <li class="alert alert-info m-2 p-1">${IngredientNames[i]}</li>`;
+              }
+              tagsNames = details[index].strTags
+                ? details[index].strTags.split(",")
+                : [];
+              for (let i = 0; i < tagsNames.length; i++) {
+                tagsContainer += `
+          <li class="alert alert-danger m-2 p-1">${tagsNames[i]}</li>
+          `;
+              }
+              detailsContainer += `
+          <div class="col-md-4">
+          <img class="w-100 rounded-3" src="${details[index].strMealThumb}" alt="">
+          <h2>${details[index].strMeal}</h2>
+          </div>
+          <div class="col-md-8">
+          <h2>Instructions</h2>
+          <p>${details[index].strInstructions}</p>
+          <h3><span class="fw-bolder">Area : </span>${details[index].strArea}</h3>
+            <h3><span class="fw-bolder">Category : </span>${details[index].strCategory}</h3>
+            <h3>Recipes :</h3>
+            <ul class="list-unstyled d-flex g-3 flex-wrap">
+            ${IngredientContainer}
+            </ul>
+            
+            <h3>Tags :</h3>
+            <ul class="list-unstyled d-flex g-3 flex-wrap">
+            ${tagsContainer}
+            </ul>
+            
+            <a target="_blank" href="${details[index].strSource}" class="btn btn-success">Source</a>
+            <a target="_blank" href="${details[index].strYoutube}" class="btn btn-danger">Youtube</a>
+            </div>`;
+            }
+            $("#searchdata").html(detailsContainer);
+          }
+        });
       });
     });
   }
@@ -206,38 +334,44 @@ export class Ui {
         <div class="container w-75 text-center">
             <div class="row g-4">
                 <div class="col-md-6">
-                    <input id="nameInput" type="text" class="form-control" placeholder="Enter Your Name">
-                    <div id="nameAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="nameInput">Name</label>
+                    <input id="nameInput" type="text" class="form-control my-2" placeholder="Enter Your Name">
+                    <div id="nameAlert" class="alert alert-danger w-100 d-none">
                         Special characters and numbers not allowed
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <input id="emailInput" type="email" class="form-control " placeholder="Enter Your Email">
-                    <div id="emailAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="emailInput">Email</label>
+                    <input id="emailInput" type="email" class="form-control my-2 " placeholder="Enter Your Email">
+                    <div id="emailAlert" class="alert alert-danger w-100 d-none">
                         Email not valid *exemple@yyy.zzz
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <input id="phoneInput" type="text" class="form-control " placeholder="Enter Your Phone">
-                    <div id="phoneAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="phoneInput">Phone</label>
+                    <input id="phoneInput" type="text" class="form-control my-2 " placeholder="Enter Your Phone">
+                    <div id="phoneAlert" class="alert alert-danger w-100 d-none">
                         Enter valid Phone Number
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <input id="ageInput" type="number" class="form-control " placeholder="Enter Your Age">
-                    <div id="ageAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="ageInput">Age</label>
+                    <input id="ageInput" type="number" class="form-control my-2 " placeholder="Enter Your Age">
+                    <div id="ageAlert" class="alert alert-danger w-100 d-none">
                         Enter valid age
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <input id="passwordInput" type="password" class="form-control " placeholder="Enter Your Password">
-                    <div id="passwordAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="passwordInput">Password</label>
+                    <input id="passwordInput" type="password" class="form-control my-2 " placeholder="Enter Your Password">
+                    <div id="passwordAlert" class="alert alert-danger w-100 d-none">
                         Enter valid password *Minimum eight characters, at least one letter and one number:*
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <input id="repasswordInput" type="password" class="form-control " placeholder="Repassword">
-                    <div id="repasswordAlert" class="alert alert-danger w-100 mt-2 d-none">
+                    <label class="text-start" for="repasswordInput">Re-password</label>
+                    <input id="repasswordInput" type="password" class="form-control my-2 " placeholder="Repassword">
+                    <div id="repasswordAlert" class="alert alert-danger w-100 d-none">
                         Enter valid repassword 
                     </div>
                 </div>
@@ -383,7 +517,6 @@ export class Ui {
           this.mealDetails(details.meals);
         }
       });
-      // strIngredient
       let detailsContainer = ``;
       let IngredientNames = [];
       let tagsNames = [];
@@ -441,7 +574,7 @@ export class Ui {
   }
   loading(location) {
     $(location).ready(() => {
-      $(".loading-screen").fadeOut(2500, () => {
+      $(".loading-screen").fadeOut(4000, () => {
         $("body").css("overflow", "auto");
       });
     });
